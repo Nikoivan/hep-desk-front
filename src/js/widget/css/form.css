@@ -1,0 +1,63 @@
+.form-widget {
+    width: 80%;
+    margin: 2rem;
+    padding: 1rem;
+    border: 2px solid #000;
+    border-radius: 5px;
+    background-color: #c0def4;
+}
+
+.form-header {
+    display: flex;
+    justify-content: center;
+}
+
+.form-title {
+    font-size: 20px;
+   
+}
+
+.form-main {
+    margin-top: 1rem;
+}
+
+.short-info, .full-info {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.short-label, .full-label {
+    font-size: 20px;
+}
+
+.short-input, .full-input {
+    margin-top: 10px;
+    border: 2px solid #000;
+    border-radius: 3px;    
+}
+
+.short-input {
+    min-height: 30px;
+}
+
+.full-input  {
+    height: 90px;
+}
+
+.form-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: end;
+}
+
+.cancel-btn {
+    margin-right: 30px;
+}
+
+.cancel-btn, .accept-btn {
+    font-size: 20px;
+    padding: 7px 15px;
+    border-radius: 8px;
+}
