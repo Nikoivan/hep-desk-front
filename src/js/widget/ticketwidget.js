@@ -135,6 +135,9 @@ export default class TicketWidget {
     }
 
     if (form) {
+      form.removeEventListener("submit", (e) => {
+        this.sendRequest({ type: "POST", method: "createTicket" }, form, e);
+      });
       form.reset();
       this.popupControl.removePopup(form);
     }
@@ -150,7 +153,6 @@ export default class TicketWidget {
     const { form, cancelBtn } = this.formControl.createForm;
 
     form.addEventListener("submit", (e) => {
-      console.log("event submit");
       this.sendRequest({ type: "POST", method: "createTicket" }, form, e);
     });
     this.popupControl.showPopup(form, this.element);
