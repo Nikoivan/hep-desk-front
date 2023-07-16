@@ -12,7 +12,6 @@ export default class PopupController {
   showPopup(element, onElement) {
     const { top, left } = onElement.getBoundingClientRect();
 
-    console.log(element);
     element.classList.add("popup");
     document.body.append(element);
 
@@ -28,7 +27,7 @@ export default class PopupController {
     if (e) {
       e.preventDefault();
     }
-    console.log(this.activePopup);
+
     element.remove();
   }
 }

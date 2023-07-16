@@ -26,4 +26,23 @@ export default class Ticket {
   get element() {
     return this._element;
   }
+
+  get btns() {
+    return {
+      edit: this.element.querySelector(".ticket-edit"),
+      remove: this.element.querySelector(".ticket-remove"),
+    };
+  }
+
+  get data() {
+    return { name: this.name, description: this.description, id: this.id };
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  remove() {
+    this._element.remove();
+  }
 }

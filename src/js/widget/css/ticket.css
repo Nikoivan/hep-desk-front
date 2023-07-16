@@ -1,0 +1,29 @@
+.ticket {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -2px;
+    padding: 15px;
+    border: 2px solid #535353;
+    border-radius: 2px; 
+    background-color: #2b94df;   
+}
+
+.ticket-check, .btn {
+    display: block;
+    text-align: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #000;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.ticket-title {
+    font-size: 20px;
+}
+
+.ticket-tools {
+    display: flex;
+}

@@ -6,7 +6,7 @@ export default class FormController {
     form.classList.add("form-widget");
     form.classList.add("item");
     form.innerHTML = `<div class="form-header">
-    <span class="form-title">Добавить тикет</span>
+    <span class="form-title"></span>
 </div>
 <div class="form-main">
     <div class="short-info">
@@ -24,11 +24,28 @@ export default class FormController {
 </div>`;
 
     this._form = form;
+    this.formTitle = this._form.querySelector(".form-title");
+    this.shortInput = this._form.querySelector(".short-input");
+    this.fullInput = this._form.querySelector(".full-input");
     this.cancelBtn = this._form.querySelector(".cancel-btn");
+    this.acceptBtn = this._form.querySelector(".accept-btn");
   }
 
-  get form() {
-    return this._form;
+  get createForm() {
+    this.formTitle.textContent = "Добавить тикет";
+    return {
+      form: this._form,
+      cancelBtn: this.cancelBtn,
+      acceptBtn: this.acceptBtn,
+    };
+  }
+
+  getEditForm(data) {
+    const { name, description } = data;
+    this.formTitle.textContent = "Изменить тикет";
+    this.shortInput.value = name;
+    this.fullInput.value = description;
+    return { form: this._form, cancelBtn: this.cancelBtn };
   }
 
   /*get data() {
@@ -39,8 +56,4 @@ export default class FormController {
     this._form.reset();
     return data;
   }*/
-
-  get cancel() {
-    return this.cancelBtn;
-  }
 }

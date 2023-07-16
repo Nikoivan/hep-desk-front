@@ -1,0 +1,37 @@
+.confirm-window {
+    background-color: #fff;
+    padding: 1rem;
+    border: 2px solid #000;
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+.confirm-header{
+    display: flex;
+    justify-content: center;
+}
+
+.confirm-title {
+    font-size: 24px;
+    text-align: center;
+}
+
+.confirm-text {
+    font-size: 20px;
+}
+
+.confirm-footer {
+    display: flex;
+    justify-content: end;
+}
+
+.confirm-cancel-btn, .confirm-accept-btn {
+    padding: 5px 15px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.confirm-cancel-btn {
+    margin-right: 25px;
+}
