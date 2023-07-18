@@ -23,7 +23,6 @@ export default class TicketWidget {
     <ul class="ticket-list">        
     </ul>
 </div>`;
-    console.log(widget);
     parentEl.append(widget);
 
     this.element = widget;
@@ -40,21 +39,37 @@ export default class TicketWidget {
     );
   }
 
-  bindTicket(ticket) {
+  async editBind(data) {
+    const response = await fetch(
+      `http://localhost:7070/?method=ticketById&id=${data.id}`
+    );
+    const json = await response.json();
+    const { form, cancelBtn, acceptBtn } = this.formControl.getEditForm(
+      data.name,
+      json.description
+    );
+    form.addEventListener("submit", (e) => {
+      this.sendRequest(
+        { type: "PUT", method: "updateById", id: data.id },
+        form,
+        e
+      );
+    });
+    this.popupControl.showPopup(form, this.element);
+    cancelBtn.addEventListener("click", (e) => {
+      if (e.target !== acceptBtn) {
+        this.popupControl.removePopup(form, e);
+      }
+    });
+  }
+
+  async bindTicket(ticket) {
     const ticketElement = ticket.element;
     const data = ticket.data;
-    const { edit, remove } = ticket.btns;
+    const { status, edit, remove } = ticket.btns;
     ticketElement.addEventListener("click", (e) => {
       if (e.target === edit) {
-        const { form, cancelBtn, acceptBtn } =
-          this.formControl.getEditForm(data);
-        // form.addEventListener("submit", (e) => this.sendRequest(e, form)); запрос на изменение тикета
-        this.popupControl.showPopup(form, this.element);
-        cancelBtn.addEventListener("click", (e) => {
-          if (e.target !== acceptBtn) {
-            this.popupControl.removePopup(form, e);
-          }
-        });
+        this.editBind(data);
       } else if (e.target === remove) {
         const { element, cancel, accept } = this.confirmControl.getConfObj();
         this.popupControl.showPopup(element, ticketElement);
@@ -63,13 +78,21 @@ export default class TicketWidget {
           this.popupControl.removePopup(element, e)
         );
         accept.addEventListener("click", () => {
-          ticket.remove;
           this.sendRequest(
             { type: "DELETE", method: "deleteById", id: ticket.getId() },
+            element,
             e
           );
-          this.popupControl.removePopup(element, e);
         });
+      } else if (e.target === status) {
+        this.sendRequest({
+          type: "PUT",
+          method: "updateById",
+          id: data.id,
+          status: { key: "status", value: "done" },
+        });
+      } else {
+        this.sendRequest({ type: "GET", method: "ticketById", id: data.id });
       }
     });
   }
@@ -91,7 +114,7 @@ export default class TicketWidget {
     }
     const url = "http://localhost:7070/?method=";
 
-    const { type, method, id } = data;
+    const { type, method, id, status } = data;
     let response;
 
     try {
@@ -102,51 +125,86 @@ export default class TicketWidget {
       if (type === "GET" || type === "DELETE") {
         if (type === "GET") {
           response = await fetch(fullUrl);
-          console.log(`get - response = ${response}`);
         } else {
           response = await fetch(fullUrl, {
             method: type,
             mode: "cors",
             headers: new Headers(),
           });
-          console.log(`delete - response = ${response}`);
         }
-      } else if (type === "POST") {
-        console.log(`post - ${type}`);
-        const formData = new FormData(form);
+      } else if (type === "POST" || type === "PUT") {
+        let formData;
+        if (form) {
+          formData = new FormData(form);
+        } else {
+          formData = new FormData();
+          formData.append(status.key, status.value);
+        }
         response = await fetch(fullUrl, {
           method: type,
           mode: "cors",
           body: formData,
           headers: new Headers(),
         });
-        console.log(`Post - response = ${response}`);
       }
       const json = await response.json();
-      console.log(json);
       if (json.err) {
         console.log(json.err);
         //добавить вывод о том, что есть ошибка
         return;
       }
-      this.addTickets(json);
+
+      this.responseHandler(json);
     } catch (e) {
       console.log(e);
     }
 
     if (form) {
-      form.removeEventListener("submit", (e) => {
-        this.sendRequest({ type: "POST", method: "createTicket" }, form, e);
-      });
-      form.reset();
       this.popupControl.removePopup(form);
     }
+  }
 
-    //GET    ?method=allTickets - список тикетов
-    //GET    ?method=ticketById&id=<id> - полное описание тикета (где <id> - идентификатор тикета)
-    //DELETE    ?method=deleteById&id=<id> - удалить объект типа Ticket по id, при успешном запросе статус ответа 204
-    //POST   ?method=createTicket - в теле запроса форма с полями для объекта типа Ticket (с id = null)
-    //POST   ?method=updateById&id=<id> - в теле запроса форма с полями для обновления объекта типа Ticket по id
+  responseHandler(data) {
+    if (Array.isArray(data)) {
+      this.addTickets(data);
+      return;
+    } else {
+      const { type, ticket, description, status, id } = data;
+      if (type === "create") {
+        this.createTicket(ticket);
+      } else if (type === "description") {
+        this.addDescription(description, id);
+      } else if (type === "status") {
+        this.changeStatus(status, id);
+      } else if (type === "deleted") {
+        this.removeTicket(id);
+      }
+      //закончил тут
+    }
+  }
+
+  addDescription(description, id) {
+    const ticket = this.tickets.find((el) => el.getId() === id);
+    ticket.showDescription(description);
+  }
+
+  changeStatus(status, id) {
+    const ticket = this.tickets.find((el) => el.getId() === id);
+    ticket.changeStatus(status);
+  }
+
+  createTicket(data) {
+    const ticket = new this.ItemType(data);
+    this.bindTicket(ticket);
+    this.ticketList.append(ticket.element);
+    this.tickets.push(ticket);
+  }
+
+  removeTicket(id) {
+    const ticket = this.tickets.find((el) => el.id === id);
+
+    ticket.element.remove();
+    this.tickets = this.tickets.filter((el) => el.id !== id);
   }
 
   onBtnAddTicket() {

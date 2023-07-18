@@ -1,12 +1,15 @@
-.ticket {
+.ticket {   
+    border: 2px solid #535353;
+    border-radius: 2px; 
+    background-color: #2b94df;   
+}
+
+.ticket-wrapper{
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: -2px;
     padding: 15px;
-    border: 2px solid #535353;
-    border-radius: 2px; 
-    background-color: #2b94df;   
 }
 
 .ticket-check, .btn {
@@ -26,4 +29,13 @@
 
 .ticket-tools {
     display: flex;
+}
+
+.description {
+    text-align: center;
+}
+
+.ticket-checked {
+    background-color: #2b94df;
+    width: 30px;
 }
