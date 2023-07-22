@@ -5,11 +5,33 @@ export default class TicketWidget {
     const { parentName, Form, Popup, Confirm, Ticket } = settings;
     const parentEl = document.querySelector(`.${parentName}`);
     this.formControl = new Form();
-
+    this.popupControl = new Popup(this.ticketList);
     this.confirmControl = new Confirm();
     this.ItemType = Ticket;
     this.tickets = [];
 
+    this.bindToDOM(parentEl);
+  }
+
+  bindToDOM(parentEl) {
+    const widget = this.getHTML();
+
+    parentEl.append(widget);
+
+    this.element = widget;
+    this.ticketList = this.element.querySelector(".ticket-list");
+    this.btnAddTicket = this.element.querySelector(".add-ticket");
+
+    this.onBtnAddTicket = this.onBtnAddTicket.bind(this);
+    this.sendRequest = this.sendRequest.bind(this);
+
+    this.btnAddTicket.addEventListener("click", this.onBtnAddTicket);
+    document.addEventListener("DOMContentLoaded", () =>
+      this.sendRequest({ type: "GET", method: "allTickets" })
+    );
+  }
+
+  getHTML() {
     const widget = document.createElement("div");
     widget.classList.add("ticket-widget");
     widget.innerHTML = `<div class="tw-header">
@@ -23,20 +45,7 @@ export default class TicketWidget {
     <ul class="ticket-list">        
     </ul>
 </div>`;
-    parentEl.append(widget);
-
-    this.element = widget;
-    this.ticketList = this.element.querySelector(".ticket-list");
-    this.btnAddTicket = this.element.querySelector(".add-ticket");
-    this.popupControl = new Popup(this.ticketList);
-
-    this.onBtnAddTicket = this.onBtnAddTicket.bind(this);
-    this.sendRequest = this.sendRequest.bind(this);
-
-    this.btnAddTicket.addEventListener("click", this.onBtnAddTicket);
-    document.addEventListener("DOMContentLoaded", () =>
-      this.sendRequest({ type: "GET", method: "allTickets" })
-    );
+    return widget;
   }
 
   async editBind(data) {
@@ -45,7 +54,7 @@ export default class TicketWidget {
     );
     const json = await response.json();
     const { form, cancelBtn, acceptBtn } = this.formControl.getEditForm(
-      data.name,
+      json.name,
       json.description
     );
     form.addEventListener("submit", (e) => {
@@ -178,6 +187,8 @@ export default class TicketWidget {
         this.changeStatus(status, id);
       } else if (type === "deleted") {
         this.removeTicket(id);
+      } else if (type === "update") {
+        this.updateTicket(id, ticket);
       }
       //закончил тут
     }
@@ -205,6 +216,11 @@ export default class TicketWidget {
 
     ticket.element.remove();
     this.tickets = this.tickets.filter((el) => el.id !== id);
+  }
+
+  updateTicket(id, data) {
+    const ticket = this.tickets.find((el) => el.getId() === id);
+    ticket.update(data);
   }
 
   onBtnAddTicket() {

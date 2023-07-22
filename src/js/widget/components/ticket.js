@@ -69,6 +69,12 @@ export default class Ticket {
     this._element.append(par);
   }
 
+  update(data) {
+    const { name } = data;
+    this.name = name;
+    this.ticketTitle.textContent = name;
+  }
+
   remove() {
     this._element.remove();
   }
